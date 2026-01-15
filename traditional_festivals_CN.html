@@ -1,0 +1,1706 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>中国传统节日图鉴</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&display=swap">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: 'Noto Serif SC', serif, sans-serif;
+            background: linear-gradient(135deg, #f9f5eb 0%, #f0e6d4 100%);
+            color: #5a3921;
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+            transition: background 1s ease;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* 整体布局 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px 15px 30px;
+            position: relative;
+            min-height: 100vh;
+        }
+        
+        /* 顶部标题栏 */
+        .header {
+            text-align: center;
+            padding: 15px 0 25px;
+            position: relative;
+        }
+        
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #8b4513;
+            letter-spacing: 3px;
+            margin-bottom: 10px;
+            position: relative;
+            display: inline-block;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, #d4a574, transparent);
+            border-radius: 3px;
+        }
+        
+        .header .subtitle {
+            font-size: 1.1rem;
+            color: #a67c52;
+            margin-top: 8px;
+            font-style: italic;
+        }
+        
+        /* 音乐控制区域 */
+        .music-controls {
+            position: absolute;
+            top: 15px;
+            right: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 10;
+        }
+        
+        .music-control {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .music-control:hover {
+            transform: scale(1.05);
+            background: rgba(255, 255, 255, 0.95);
+        }
+        
+        .music-control i {
+            font-size: 1.4rem;
+            color: #b8860b;
+        }
+        
+        .music-control.paused i::before {
+            content: "♪";
+        }
+        
+        .music-control.playing i::before {
+            content: "♫";
+        }
+        
+        .volume-slider {
+            width: 80px;
+            opacity: 0;
+            transform: translateX(-20px);
+            transition: all 0.3s ease;
+        }
+        
+        .music-controls:hover .volume-slider {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .volume-slider input {
+            width: 100%;
+            height: 4px;
+            -webkit-appearance: none;
+            background: rgba(212, 165, 116, 0.3);
+            border-radius: 2px;
+            outline: none;
+        }
+        
+        .volume-slider input::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #d4a574;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* 加载动画 */
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #f9f5eb 0%, #f0e6d4 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+        
+        .loading.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(212, 165, 116, 0.3);
+            border-top-color: #d4a574;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* 节日导航区 */
+        .festival-nav {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 40px;
+            padding: 0 10px;
+        }
+        
+        .festival-item {
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 16px;
+            padding: 15px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .festival-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--festival-color);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .festival-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .festival-item.active {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            border-color: var(--festival-color);
+            background: rgba(255, 255, 255, 0.9);
+        }
+        
+        .festival-item.active::before {
+            transform: scaleX(1);
+        }
+        
+        .festival-icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 12px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            transition: all 0.4s ease;
+            font-size: 2.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .festival-name {
+            font-size: 0.95rem;
+            color: #5a3921;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+        
+        /* 节日详情区 */
+        .festival-detail {
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 20px;
+            padding: 30px 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+            transition: all 0.8s ease;
+            position: relative;
+            overflow: hidden;
+            min-height: 350px;
+        }
+        
+        .festival-title {
+            font-size: 1.8rem;
+            color: #8b4513;
+            margin-bottom: 20px;
+            text-align: center;
+            position: relative;
+            padding-bottom: 15px;
+        }
+        
+        .festival-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--festival-color), transparent);
+        }
+        
+        .festival-date {
+            text-align: center;
+            font-size: 1.1rem;
+            color: #a67c52;
+            margin-bottom: 25px;
+            font-style: italic;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .festival-content {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+        
+        .festival-desc {
+            flex: 1;
+            font-size: 1.05rem;
+            color: #5a3921;
+            line-height: 1.8;
+            text-align: justify;
+        }
+        
+        .festival-illustration {
+            width: 200px;
+            height: 200px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            background: linear-gradient(135deg, var(--festival-color-light), var(--festival-color));
+            color: white;
+            position: relative;
+        }
+        
+        .festival-illustration::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+        }
+        
+        /* 祝福卡片 */
+        .blessing-card {
+            background: rgba(255, 255, 255, 0.92);
+            border-radius: 20px;
+            padding: 30px 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(212, 165, 116, 0.2);
+        }
+        
+        .blessing-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, var(--festival-color-light), transparent);
+            opacity: 0.1;
+            animation: shine 3s linear infinite;
+        }
+        
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+        
+        .card-header {
+            text-align: center;
+            margin-bottom: 25px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .card-icon {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, var(--festival-color-light), var(--festival-color));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: white;
+            box-shadow: 0 6px 15px rgba(212, 165, 116, 0.3);
+        }
+        
+        .card-title {
+            font-size: 1.5rem;
+            color: #8b4513;
+            margin-bottom: 8px;
+        }
+        
+        .card-subtitle {
+            font-size: 1rem;
+            color: #a67c52;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .input-group label {
+            display: block;
+            font-size: 0.95rem;
+            color: #5a3921;
+            margin-bottom: 8px;
+            padding-left: 8px;
+            font-weight: 500;
+        }
+        
+        .input-group input, .input-group textarea {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid #e0d6c9;
+            border-radius: 12px;
+            font-family: 'Noto Serif SC', serif;
+            font-size: 1rem;
+            color: #5a3921;
+            background: rgba(255, 255, 255, 0.95);
+            transition: all 0.3s ease;
+        }
+        
+        .input-group input:focus, .input-group textarea:focus {
+            outline: none;
+            border-color: var(--festival-color);
+            box-shadow: 0 0 0 4px rgba(212, 165, 116, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .input-group textarea {
+            height: 120px;
+            resize: none;
+            line-height: 1.6;
+        }
+        
+        .character-count {
+            text-align: right;
+            font-size: 0.85rem;
+            color: #a67c52;
+            margin-top: 5px;
+        }
+        
+        .character-count.warning {
+            color: #dc2626;
+        }
+        
+        .card-footer {
+            text-align: center;
+            margin-top: 25px;
+            padding-top: 25px;
+            border-top: 1px dashed #e0d6c9;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .card-signature {
+            font-size: 1.1rem;
+            color: var(--festival-color);
+            font-style: italic;
+            margin-bottom: 25px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+        
+        .btn {
+            padding: 14px 30px;
+            border-radius: 12px;
+            border: none;
+            font-family: 'Noto Serif SC', serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            letter-spacing: 1px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--festival-color-light), var(--festival-color));
+            color: white;
+            box-shadow: 0 6px 15px rgba(212, 165, 116, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(212, 165, 116, 0.4);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.95);
+            color: #5a3921;
+            border: 2px solid var(--festival-color);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(212, 165, 116, 0.1);
+            transform: translateY(-3px);
+        }
+        
+        /* 背景动效 */
+        .background-effects {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .particle {
+            position: absolute;
+            pointer-events: none;
+        }
+        
+        /* 节日专属动效 */
+        .snowflake {
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+            filter: blur(1px);
+            animation: snow-fall linear infinite;
+        }
+        
+        .raindrop {
+            width: 2px;
+            height: 20px;
+            background: linear-gradient(to bottom, transparent, #22d3ee);
+            border-radius: 0 0 10px 10px;
+            animation: rain-fall linear infinite;
+        }
+        
+        .leaf {
+            width: 15px;
+            height: 15px;
+            background: #22c55e;
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+            opacity: 0.7;
+            animation: leaf-fall linear infinite;
+        }
+        
+        .firework {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            animation: firework-explode 1s ease-out infinite;
+        }
+        
+        /* 动效关键帧 */
+        @keyframes snow-fall {
+            0% { transform: translateY(-100px) rotate(0deg); }
+            100% { transform: translateY(100vh) rotate(360deg); }
+        }
+        
+        @keyframes rain-fall {
+            0% { transform: translateY(-100px); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(100vh); opacity: 0; }
+        }
+        
+        @keyframes leaf-fall {
+            0% { transform: translateY(-100px) rotate(0deg); }
+            100% { transform: translateY(100vh) rotate(360deg); }
+        }
+        
+        @keyframes firework-explode {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(20); opacity: 0; }
+        }
+        
+        /* 提示信息 */
+        .toast {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(255, 255, 255, 0.98);
+            padding: 18px 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            text-align: center;
+            max-width: 90%;
+            border-left: 5px solid var(--festival-color);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+        
+        /* 节日专属背景 */
+        .spring-bg { background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); }
+        .lantern-bg { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); }
+        .dragon-bg { background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); }
+        .qingming-bg { background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); }
+        .dragonboat-bg { background: linear-gradient(135deg, #ccfbf1 0%, #99f6e4 100%); }
+        .qixi-bg { background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%); }
+        .ghost-bg { background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%); }
+        .midautumn-bg { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); }
+        .chongyang-bg { background: linear-gradient(135deg, #ffedd5 0%, #fed7aa 100%); }
+        .dongzhi-bg { background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); }
+        .laba-bg { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); }
+        .xiaonian-bg { background: linear-gradient(135deg, #ffedd5 0%, #fed7aa 100%); }
+        
+        /* 响应式调整 */
+        @media (max-width: 1024px) {
+            .container {
+                max-width: 90%;
+            }
+            
+            .festival-content {
+                flex-direction: column;
+            }
+            
+            .festival-illustration {
+                width: 180px;
+                height: 180px;
+                order: -1;
+                margin-bottom: 25px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .festival-nav {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+                gap: 12px;
+            }
+            
+            .festival-detail {
+                padding: 25px 20px;
+            }
+            
+            .festival-title {
+                font-size: 1.6rem;
+            }
+            
+            .blessing-card {
+                padding: 25px 20px;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .btn {
+                width: 100%;
+                min-width: auto;
+            }
+            
+            .music-controls {
+                position: relative;
+                top: 0;
+                right: 0;
+                justify-content: center;
+                margin-top: 15px;
+            }
+            
+            .volume-slider {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.6rem;
+            }
+            
+            .festival-nav {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .festival-desc {
+                font-size: 1rem;
+            }
+            
+            .festival-illustration {
+                width: 150px;
+                height: 150px;
+                font-size: 3rem;
+            }
+        }
+        
+        /* 震动反馈 */
+        @media (max-width: 768px) {
+            .festival-item:active {
+                animation: vibrate 0.1s ease;
+            }
+            
+            .btn:active {
+                animation: vibrate 0.1s ease;
+            }
+        }
+        
+        @keyframes vibrate {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-2px); }
+            75% { transform: translateX(2px); }
+        }
+        
+        /* 滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(212, 165, 116, 0.1);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--festival-color);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--festival-color-dark);
+        }
+    </style>
+</head>
+<body>
+    <!-- 加载动画 -->
+    <div class="loading" id="loading">
+        <div class="loading-spinner"></div>
+        <div style="font-size: 1.2rem; color: #8b4513; margin-top: 10px;">加载节日数据中...</div>
+    </div>
+    
+    <!-- 背景动效层 -->
+    <div class="background-effects" id="backgroundEffects"></div>
+    
+    <!-- 主容器 -->
+    <div class="container">
+        <!-- 顶部标题栏 -->
+        <header class="header">
+            <h1>中国传统节日图鉴</h1>
+            <div class="subtitle">感受千年文化，传递佳节祝福</div>
+            
+            <!-- 音乐控制 -->
+            <div class="music-controls">
+                <div class="music-control" id="musicControl">
+                    <i></i>
+                </div>
+                <div class="volume-slider">
+                    <input type="range" id="volumeControl" min="0" max="1" step="0.1" value="0.4">
+                </div>
+            </div>
+        </header>
+        
+        <!-- 节日导航区 -->
+        <section class="festival-nav" id="festivalNav">
+            <!-- 节日导航项将由JavaScript动态生成 -->
+        </section>
+        
+        <!-- 节日详情展示区 -->
+        <section class="festival-detail" id="festivalDetail">
+            <!-- 节日详情将由JavaScript动态生成 -->
+        </section>
+        
+        <!-- 祝福卡片交互区 -->
+        <section class="blessing-card" id="blessingCard">
+            <!-- 祝福卡片将由JavaScript动态生成 -->
+        </section>
+    </div>
+    
+    <!-- 提示信息 -->
+    <div class="toast" id="toast"></div>
+    
+    <!-- 音频元素 -->
+    <audio id="bgMusic" loop>
+        <source src="https://assets.mixkit.co/music/preview/mixkit-chinese-new-year-traditional-961.mp3" type="audio/mpeg">
+    </audio>
+    
+    <!-- 备用音乐源（防止链接失效） -->
+    <audio id="backupMusic1" preload="auto" style="display: none;">
+        <source src="https://assets.mixkit.co/music/preview/mixkit-happy-dance-461.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="backupMusic2" preload="auto" style="display: none;">
+        <source src="https://assets.mixkit.co/music/preview/mixkit-melodic-moon-467.mp3" type="audio/mpeg">
+    </audio>
+    
+    <!-- html2canvas库 -->
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    
+    <script>
+        // 增强的节日数据
+        const festivals = [
+            {
+                id: 'spring',
+                name: '春节',
+                date: '农历正月初一',
+                color: '#dc2626',
+                colorLight: '#f87171',
+                colorDark: '#991b1b',
+                icon: '🧧',
+                desc: '春节，即农历新年，是中国最隆重的传统节日。家家户户贴春联、放鞭炮、吃团圆饭、拜年祝福，寓意辞旧迎新、迎祥纳福。除夕夜的团圆饭是家人的重要聚会，压岁钱寓意辟邪驱鬼，保佑平安。',
+                customs: ['贴春联', '放鞭炮', '吃团圆饭', '拜年', '发红包', '舞龙舞狮'],
+                music: 'https://assets.mixkit.co/music/preview/mixkit-chinese-new-year-traditional-961.mp3',
+                signature: '新春快乐 万事如意',
+                placeholder: '愿新的一年，家人安康，事业顺利，心想事成...',
+                illustration: '福',
+                effect: 'fireworks'
+            },
+            {
+                id: 'lantern',
+                name: '元宵节',
+                date: '农历正月十五',
+                color: '#f59e0b',
+                colorLight: '#fbbf24',
+                colorDark: '#d97706',
+                icon: '🏮',
+                desc: '元宵节又称上元节，是春节后的第一个重要节日。人们吃元宵、赏花灯、猜灯谜，庆祝新春的延续。元宵象征团圆美满，花灯则寓意驱魔降福、光明希望。',
+                customs: ['吃元宵', '赏花灯', '猜灯谜', '舞龙灯', '放烟花'],
+                music: 'https://assets.mixkit.co/music/preview/mixkit-happy-dance-461.mp3',
+                signature: '元宵团圆 灯月同辉',
+                placeholder: '愿灯火璀璨，家人团圆，幸福美满...',
+                illustration: '灯',
+                effect: 'lanterns'
+            },
+            {
+                id: 'dragon',
+                name: '龙抬头',
+                date: '农历二月初二',
+                color: '#10b981',
+                colorLight: '#34d399',
+                colorDark: '#059669',
+                icon: '🐲',
+                desc: '龙抬头，又称春耕节，传说这天龙王会苏醒抬头，带来雨水。人们理发（称"剃龙头"）、吃龙须面、炸油糕（称"食龙胆"），祈求一年风调雨顺、五谷丰登。',
+                customs: ['理发剃头', '吃龙须面', '祭龙王', '炒豆子', '引田龙'],
+                music: 'https://assets.mixkit.co/music/preview/mixkit-ambient-relax-312.mp3',
+                signature: '龙马精神 风调雨顺',
+                placeholder: '愿春雨润物，五谷丰登，事业腾飞...',
+                illustration: '龙',
+                effect: 'leaves'
+            },
+            {
+                id: 'qingming',
+                name: '清明节',
+                date: '公历4月4日-6日',
+                color: '#0ea5e9',
+                colorLight: '#38bdf8',
+                colorDark: '#0284c7',
+                icon: '🌿',
+                desc: '清明节是祭祖扫墓的重要日子，也是踏青郊游的好时节。人们追思先人，感受生命与自然的和谐。清明插柳、放风筝、吃青团等习俗，既有对先人的缅怀，也有对新生机的向往。',
+                customs: ['扫墓祭祖', '踏青郊游', '插柳戴柳', '放风筝', '吃青团'],
+                music: 'https://assets.mixkit.co/music/preview/mixkit-sad-ambience-467.mp3',
+                signature: '清明祭祖 慎终追远',
+                placeholder: '追思先人，珍惜当下，愿家族兴旺...',
+                illustration: '柳',
+                effect: 'rain'
+            },
+            {
+                id: 'dragonboat',
+                name: '端午节',
+                date: '农历五月初五',
+                color: '#06b6d4',
+                colorLight: '#22d3ee',
+                colorDark: '#0891b2',
+                icon: '🎏',
+                desc: '端午节是为了纪念屈原的传统节日。人们吃粽子、赛龙舟、挂艾草，寓意驱邪避疫、祈求安康。雄黄酒、五彩绳等习俗都体现了古人的防疫智慧和美好愿望。',
+                customs: ['吃粽子', '赛龙舟', '挂艾草', '戴香包', '饮雄黄酒'],
+                music: 'https://assets.mixkit.co/music/preview/mixkit-adventure-481.mp3',
+                signature: '端午安康 驱邪避疫',
+                placeholder: '愿家人安康，远离疾病，端午祥和...',
+                illustration: '粽',
+                effect: 'leaves'
+            },
+            {
+                id: 'qixi',
+                name: '七夕节',
+                date: '农历七月初七',
+                color: '#8b5cf6',
+                colorLight: '#a78bfa',
+                colorDark: '#7c3aed',
+                icon: '🌟',
+                desc: '七夕节，又称乞巧节，是中国的情人节。传说牛郎织女这天鹊桥相会，少女们祈求巧手与美好姻缘。乞巧、拜织女、吃巧果等习俗体现了人们对美好爱情和灵巧手艺的向往。',
+                customs: ['拜织女', '乞巧', '吃巧果', '穿针乞巧', '种生求子'],
+                music: 'https://assets.mixkit.co/music/preview/mixkit-romantic-date-482.mp3',
+                signature: '七夕情缘 天作之合',
+                placeholder: '愿有情人终成眷属，爱情美满...',
+                illustration: '鹊',
+                effect: 'stars'
+            },
+            {
+                id: 'ghost',
+                name: '中元节',
+                date: '农历七月十五',
+                color: '#6366f1',
+                colorLight: '#818cf8',
+                colorDark: '#4f46e5',
+                icon: '🕯️',
+                desc: '中元节，俗称鬼节，是祭祖的重要节日。人们放河灯、祭先祖，表达对先人的怀念与敬意。这体现了中国人"敬天法祖"的传统观念和对生死轮回的理解。',
+                customs: ['放河灯', '祭先祖', '烧纸钱', '祀亡魂', '吃鸭肉'],
+                music: 'https://assets.mixkit.co/music/preview/mixkit-mysterious-ambience-468.mp3',
+                signature: '中元祭祖 福佑后人',
+                placeholder: '缅怀先人，传承家风，愿家族平安...',
+                illustration: '河',
+                effect: 'lanterns'
+            },
+            {
+                id: 'midautumn',
+                name: '中秋节',
+                date: '农历八月十五',
+                color: '#f59e0b',
+                colorLight: '#fbbf24',
+                colorDark: '#d97706',
+                icon: '🌕',
+                desc: '中秋节是团圆的节日，人们赏月、吃月饼、猜灯谜，寄托对亲人的思念和对美好生活的向往。圆月象征团圆，月饼代表圆满，各种祭月仪式体现了古人对天象的敬畏。',
+                customs: ['赏月', '吃月饼', '猜灯谜', '祭月', '玩花灯'],
+                music: 'https://assets.mixkit.co/music/preview/mixkit-melodic-moon-467.mp3',
+                signature: '中秋团圆 月满人圆',
+                placeholder: '愿月圆人团圆，家庭和睦，幸福安康...',
+                illustration: '月',
+                effect: 'moon'
+            },
+            {
+                id: 'chongyang',
+                name: '重阳节',
+                date: '农历九月初九',
+                color: '#f97316',
+                colorLight: '#fb923c',
+                colorDark: '#ea580c',
+                icon: '🌼',
+                desc: '重阳节是敬老节，人们登高、赏菊、饮菊花酒，表达对老人的敬爱和祝福，祈求健康长寿。数字九为阳数之极，重阳寓意长久长寿。',
+                customs: ['登高', '赏菊', '饮菊花酒', '吃重阳糕', '佩茱萸'],
+                music: 'https://assets.mixkit.co/music/preview/mixkit-autumn-flowers-480.mp3',
+                signature: '重阳敬老 福寿安康',
+                placeholder: '愿长辈健康长寿，家庭和睦，福寿双全...',
+                illustration: '菊',
+                effect: 'leaves'
+            },
+            {
+                id: 'dongzhi',
+                name: '冬至',
+                date: '公历12月21日-23日',
+                color: '#64748b',
+                colorLight: '#94a3b8',
+                colorDark: '#475569',
+                icon: '❄️',
+                desc: '冬至是一年中黑夜最长的一天，北方吃饺子，南方吃汤圆，寓意团圆美满，迎接阳气的回升。冬至大如年，古人认为这是阴阳转换的关键时刻。',
+                customs: ['吃饺子', '吃汤圆', '祭祖', '数九', '画九'],
+                music: 'https://assets.mixkit.co/music/preview/mixkit-winter-landscape-477.mp3',
+                signature: '冬至安康 团圆美满',
+                placeholder: '愿寒冬温暖，家人团聚，幸福安康...',
+                illustration: '饺',
+                effect: 'snow'
+            },
+            {
+                id: 'laba',
+                name: '腊八节',
+                date: '农历腊月初八',
+                color: '#f59e0b',
+                colorLight: '#fbbf24',
+                colorDark: '#d97706',
+                icon: '🥣',
+                desc: '腊八节是春节的前奏，人们喝腊八粥，祭祀祖先和神灵，祈求丰收和吉祥。腊八粥汇集多种食材，象征丰收和富足。',
+                customs: ['喝腊八粥', '祭祀', '泡腊八蒜', '做腊八豆腐', '吃冰'],
+                music: 'https://assets.mixkit.co/music/preview/mixkit-warm-cozy-464.mp3',
+                signature: '腊八安康 五谷丰登',
+                placeholder: '愿五谷丰登，家庭富足，腊八温暖...',
+                illustration: '粥',
+                effect: 'lanterns'
+            },
+            {
+                id: 'xiaonian',
+                name: '小年',
+                date: '农历腊月廿三/廿四',
+                color: '#f97316',
+                colorLight: '#fb923c',
+                colorDark: '#ea580c',
+                icon: '🧹',
+                desc: '小年是春节的序幕，人们祭灶神、扫尘、贴窗花，准备迎接新年的到来。祭灶神是向灶王爷汇报一年善恶，祈求上天言好事。',
+                customs: ['祭灶神', '扫尘', '贴窗花', '吃灶糖', '沐浴理发'],
+                music: 'https://assets.mixkit.co/music/preview/mixkit-chinese-new-year-traditional-961.mp3',
+                signature: '小年吉祥 辞旧迎新',
+                placeholder: '愿灶神上天言好事，下界保平安...',
+                illustration: '灶',
+                effect: 'fireworks'
+            }
+        ];
+
+        // 全局变量
+        let currentFestivalIndex = 0;
+        let isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        
+        // DOM元素
+        const loading = document.getElementById('loading');
+        const festivalNav = document.getElementById('festivalNav');
+        const festivalDetail = document.getElementById('festivalDetail');
+        const blessingCard = document.getElementById('blessingCard');
+        const backgroundEffects = document.getElementById('backgroundEffects');
+        const musicControl = document.getElementById('musicControl');
+        const volumeControl = document.getElementById('volumeControl');
+        const bgMusic = document.getElementById('bgMusic');
+        const toast = document.getElementById('toast');
+        
+        // 初始化页面
+        async function initPage() {
+            // 设置CSS变量
+            setFestivalCSSVariables(0);
+            
+            // 模拟加载延迟
+            await new Promise(resolve => setTimeout(resolve, 800));
+            
+            // 生成节日导航
+            renderFestivalNav();
+            
+            // 初始化第一个节日
+            renderFestivalDetail(0);
+            renderBlessingCard(0);
+            updateBackgroundEffects(0);
+            
+            // 设置音乐控制
+            setupMusicControl();
+            
+            // 设置音频自动播放
+            setupAudioAutoPlay();
+            
+            // 隐藏加载动画
+            loading.classList.add('hidden');
+            
+            // 显示欢迎提示
+            setTimeout(() => {
+                showToast('欢迎来到中国传统节日图鉴！点击节日图标开始探索吧～');
+            }, 1000);
+        }
+        
+        // 设置节日CSS变量
+        function setFestivalCSSVariables(index) {
+            const festival = festivals[index];
+            const root = document.documentElement;
+            
+            root.style.setProperty('--festival-color', festival.color);
+            root.style.setProperty('--festival-color-light', festival.colorLight);
+            root.style.setProperty('--festival-color-dark', festival.colorDark);
+        }
+        
+        // 生成节日导航
+        function renderFestivalNav() {
+            festivalNav.innerHTML = '';
+            
+            festivals.forEach((festival, index) => {
+                const item = document.createElement('div');
+                item.className = `festival-item ${index === 0 ? 'active' : ''}`;
+                item.dataset.index = index;
+                item.style.setProperty('--festival-color', festival.color);
+                
+                item.innerHTML = `
+                    <div class="festival-icon">${festival.icon}</div>
+                    <div class="festival-name">${festival.name}</div>
+                `;
+                
+                item.addEventListener('click', () => {
+                    // 触觉反馈（移动端）
+                    if (isMobile && 'vibrate' in navigator) {
+                        navigator.vibrate(10);
+                    }
+                    
+                    // 更新当前选中的节日
+                    document.querySelector('.festival-item.active').classList.remove('active');
+                    item.classList.add('active');
+                    
+                    // 设置CSS变量
+                    setFestivalCSSVariables(index);
+                    
+                    // 渲染节日详情和祝福卡片
+                    renderFestivalDetail(index);
+                    renderBlessingCard(index);
+                    updateBackgroundEffects(index);
+                    
+                    // 更新音乐
+                    updateMusic(index);
+                    
+                    // 更新当前节日索引
+                    currentFestivalIndex = index;
+                    
+                    // 滚动到顶部
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    
+                    // 显示切换提示
+                    showToast(`已切换到${festival.name} 🌟`);
+                });
+                
+                festivalNav.appendChild(item);
+            });
+        }
+        
+        // 生成节日详情
+        function renderFestivalDetail(index) {
+            const festival = festivals[index];
+            
+            festivalDetail.className = `festival-detail ${festival.id}-bg`;
+            festivalDetail.innerHTML = `
+                <h2 class="festival-title">${festival.name}</h2>
+                <div class="festival-date">
+                    <span>📅</span>
+                    <span>${festival.date}</span>
+                </div>
+                <div class="festival-content">
+                    <div class="festival-desc">
+                        <p>${festival.desc}</p>
+                        <div style="margin-top: 20px;">
+                            <strong>主要习俗：</strong>
+                            <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px;">
+                                ${festival.customs.map(custom => 
+                                    `<span style="background: var(--festival-color-light); color: white; padding: 6px 12px; border-radius: 20px; font-size: 0.9rem;">${custom}</span>`
+                                ).join('')}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="festival-illustration">
+                        ${festival.illustration}
+                    </div>
+                </div>
+            `;
+            
+            // 添加淡入动画
+            festivalDetail.style.opacity = '0';
+            festivalDetail.style.transform = 'translateY(30px)';
+            
+            setTimeout(() => {
+                festivalDetail.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+                festivalDetail.style.opacity = '1';
+                festivalDetail.style.transform = 'translateY(0)';
+            }, 10);
+        }
+        
+        // 生成祝福卡片
+        function renderBlessingCard(index) {
+            const festival = festivals[index];
+            
+            blessingCard.className = `blessing-card ${festival.id}-bg`;
+            blessingCard.innerHTML = `
+                <div class="card-header">
+                    <div class="card-icon">${festival.icon}</div>
+                    <h3 class="card-title">${festival.name}祝福卡片</h3>
+                    <div class="card-subtitle">定制专属祝福，分享佳节喜悦</div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="userName">您的姓名</label>
+                    <input type="text" id="userName" placeholder="请输入您的姓名" maxlength="20">
+                </div>
+                
+                <div class="input-group">
+                    <label for="blessingText">祝福寄语 <span id="charCount">0/120</span></label>
+                    <textarea id="blessingText" placeholder="${festival.placeholder}" maxlength="120"></textarea>
+                    <div class="character-count" id="charCountDisplay">还可以输入120字</div>
+                </div>
+                
+                <div class="card-footer">
+                    <div class="card-signature">${festival.signature}</div>
+                    <div class="btn-group">
+                        <button class="btn btn-secondary" id="resetBtn">
+                            <span>清空祝福</span>
+                        </button>
+                        <button class="btn btn-primary" id="saveBtn">
+                            <span>保存祝福卡片</span>
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            // 添加卡片上浮动画
+            blessingCard.style.transform = 'translateY(0)';
+            
+            // 绑定按钮事件
+            document.getElementById('resetBtn').addEventListener('click', resetBlessingCard);
+            document.getElementById('saveBtn').addEventListener('click', () => saveBlessingCard(index));
+            
+            // 绑定输入事件
+            const userNameInput = document.getElementById('userName');
+            const blessingTextInput = document.getElementById('blessingText');
+            const charCountDisplay = document.getElementById('charCountDisplay');
+            const charCount = document.getElementById('charCount');
+            
+            userNameInput.addEventListener('input', handleInputInteraction);
+            blessingTextInput.addEventListener('input', function() {
+                const length = this.value.length;
+                const remaining = 120 - length;
+                
+                charCount.textContent = `${length}/120`;
+                charCountDisplay.textContent = `还可以输入${remaining}字`;
+                
+                if (remaining < 20) {
+                    charCountDisplay.classList.add('warning');
+                } else {
+                    charCountDisplay.classList.remove('warning');
+                }
+                
+                handleInputInteraction();
+            });
+            
+            // 触发一次输入事件以初始化计数
+            blessingTextInput.dispatchEvent(new Event('input'));
+        }
+        
+        // 处理输入交互
+        function handleInputInteraction() {
+            // 卡片上浮动画
+            blessingCard.style.transform = 'translateY(-8px)';
+            setTimeout(() => {
+                blessingCard.style.transform = 'translateY(0)';
+            }, 300);
+            
+            // 移动端震动反馈
+            if (isMobile && 'vibrate' in navigator) {
+                navigator.vibrate(5);
+            }
+        }
+        
+        // 更新背景动效
+        function updateBackgroundEffects(index) {
+            const festival = festivals[index];
+            backgroundEffects.innerHTML = '';
+            
+            // 清除现有动效
+            clearTimeout(window.particleTimer);
+            
+            // 根据节日效果类型生成不同动效
+            switch (festival.effect) {
+                case 'fireworks':
+                    createFireworks();
+                    break;
+                case 'lanterns':
+                    createLanterns();
+                    break;
+                case 'rain':
+                    createRain();
+                    break;
+                case 'snow':
+                    createSnow();
+                    break;
+                case 'leaves':
+                    createLeaves();
+                    break;
+                case 'stars':
+                    createStars();
+                    break;
+                case 'moon':
+                    createMoon();
+                    break;
+            }
+        }
+        
+        // 创建烟花效果
+        function createFireworks() {
+            const colors = ['#dc2626', '#f59e0b', '#10b981', '#0ea5e9', '#8b5cf6'];
+            
+            function launchFirework() {
+                const firework = document.createElement('div');
+                firework.className = 'firework';
+                firework.style.left = `${Math.random() * 100}%`;
+                firework.style.top = `${Math.random() * 100}%`;
+                firework.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                backgroundEffects.appendChild(firework);
+                
+                setTimeout(() => {
+                    if (firework.parentNode) {
+                        backgroundEffects.removeChild(firework);
+                    }
+                }, 1000);
+                
+                window.particleTimer = setTimeout(launchFirework, 800 + Math.random() * 1200);
+            }
+            
+            // 启动多个烟花
+            for (let i = 0; i < 5; i++) {
+                setTimeout(launchFirework, i * 300);
+            }
+        }
+        
+        // 创建灯笼效果
+        function createLanterns() {
+            for (let i = 0; i < 5; i++) {
+                const lantern = document.createElement('div');
+                lantern.className = 'lantern';
+                lantern.style.left = `${15 + i * 20}%`;
+                lantern.style.top = `${10 + i * 5}%`;
+                lantern.style.width = `${40 + Math.random() * 20}px`;
+                lantern.style.height = `${lantern.style.width}px`;
+                lantern.style.background = `radial-gradient(circle at 30% 30%, #dc2626, #991b1b)`;
+                lantern.style.borderRadius = '50%';
+                lantern.style.boxShadow = '0 0 30px rgba(220, 38, 38, 0.5)';
+                lantern.style.animation = `swing ${4 + Math.random() * 4}s infinite ease-in-out ${Math.random() * 2}s`;
+                backgroundEffects.appendChild(lantern);
+            }
+            
+            // 重新定义swing动画
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes swing {
+                    0%, 100% { transform: translateY(0) rotate(-8deg); }
+                    50% { transform: translateY(-20px) rotate(8deg); }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+        
+        // 创建雨滴效果
+        function createRain() {
+            for (let i = 0; i < 30; i++) {
+                const raindrop = document.createElement('div');
+                raindrop.className = 'raindrop';
+                raindrop.style.left = `${Math.random() * 100}%`;
+                raindrop.style.height = `${15 + Math.random() * 20}px`;
+                raindrop.style.animationDuration = `${1 + Math.random() * 2}s`;
+                raindrop.style.animationDelay = `${Math.random() * 2}s`;
+                backgroundEffects.appendChild(raindrop);
+            }
+        }
+        
+        // 创建雪花效果
+        function createSnow() {
+            for (let i = 0; i < 40; i++) {
+                const snowflake = document.createElement('div');
+                snowflake.className = 'snowflake';
+                snowflake.style.left = `${Math.random() * 100}%`;
+                snowflake.style.width = `${4 + Math.random() * 6}px`;
+                snowflake.style.height = snowflake.style.width;
+                snowflake.style.animationDuration = `${5 + Math.random() * 10}s`;
+                snowflake.style.animationDelay = `${Math.random() * 5}s`;
+                snowflake.style.opacity = 0.3 + Math.random() * 0.7;
+                backgroundEffects.appendChild(snowflake);
+            }
+        }
+        
+        // 创建树叶效果
+        function createLeaves() {
+            const leafColors = ['#22c55e', '#16a34a', '#15803d'];
+            
+            for (let i = 0; i < 25; i++) {
+                const leaf = document.createElement('div');
+                leaf.className = 'leaf';
+                leaf.style.left = `${Math.random() * 100}%`;
+                leaf.style.background = leafColors[Math.floor(Math.random() * leafColors.length)];
+                leaf.style.width = `${10 + Math.random() * 10}px`;
+                leaf.style.height = leaf.style.width;
+                leaf.style.animationDuration = `${8 + Math.random() * 12}s`;
+                leaf.style.animationDelay = `${Math.random() * 5}s`;
+                leaf.style.opacity = 0.4 + Math.random() * 0.6;
+                leaf.style.transform = `rotate(${Math.random() * 360}deg)`;
+                backgroundEffects.appendChild(leaf);
+            }
+        }
+        
+        // 创建星星效果
+        function createStars() {
+            for (let i = 0; i < 15; i++) {
+                const star = document.createElement('div');
+                star.style.position = 'absolute';
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                star.style.width = `${3 + Math.random() * 5}px`;
+                star.style.height = star.style.width;
+                star.style.background = 'white';
+                star.style.borderRadius = '50%';
+                star.style.boxShadow = '0 0 10px white';
+                star.style.animation = `twinkle ${2 + Math.random() * 3}s infinite alternate`;
+                backgroundEffects.appendChild(star);
+            }
+            
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes twinkle {
+                    0% { opacity: 0.2; transform: scale(0.8); }
+                    100% { opacity: 1; transform: scale(1.2); }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+        
+        // 创建月亮效果
+        function createMoon() {
+            const moon = document.createElement('div');
+            moon.style.position = 'absolute';
+            moon.style.right = '5%';
+            moon.style.top = '10%';
+            moon.style.width = '80px';
+            moon.style.height = '80px';
+            moon.style.background = 'radial-gradient(circle at 30% 30%, #fef3c7, #f59e0b)';
+            moon.style.borderRadius = '50%';
+            moon.style.boxShadow = '0 0 40px #f59e0b, inset 0 0 20px white';
+            moon.style.animation = 'float 6s infinite ease-in-out';
+            backgroundEffects.appendChild(moon);
+            
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes float {
+                    0%, 100% { transform: translateY(0) scale(1); }
+                    50% { transform: translateY(-20px) scale(1.05); }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+        
+        // 设置音乐控制
+        function setupMusicControl() {
+            // 设置初始音量
+            bgMusic.volume = 0.4;
+            
+            // 音量控制
+            volumeControl.addEventListener('input', (e) => {
+                bgMusic.volume = e.target.value;
+            });
+            
+            // 音乐控制按钮点击事件
+            musicControl.addEventListener('click', () => {
+                if (bgMusic.paused) {
+                    bgMusic.play().then(() => {
+                        musicControl.classList.add('playing');
+                        musicControl.classList.remove('paused');
+                    }).catch(e => {
+                        console.log("播放失败:", e);
+                    });
+                } else {
+                    bgMusic.pause();
+                    musicControl.classList.add('paused');
+                    musicControl.classList.remove('playing');
+                }
+                
+                // 移动端震动反馈
+                if (isMobile && 'vibrate' in navigator) {
+                    navigator.vibrate(20);
+                }
+            });
+            
+            // 初始状态
+            musicControl.classList.add('paused');
+            
+            // 监听音频事件
+            bgMusic.addEventListener('ended', () => {
+                musicControl.classList.add('paused');
+                musicControl.classList.remove('playing');
+            });
+            
+            bgMusic.addEventListener('playing', () => {
+                musicControl.classList.add('playing');
+                musicControl.classList.remove('paused');
+            });
+        }
+        
+        // 设置音频自动播放
+        function setupAudioAutoPlay() {
+            // 创建用户交互检测
+            let userInteracted = false;
+            
+            const enableAudio = () => {
+                if (!userInteracted) {
+                    userInteracted = true;
+                    bgMusic.play().then(() => {
+                        musicControl.classList.add('playing');
+                        musicControl.classList.remove('paused');
+                    }).catch(e => {
+                        console.log("自动播放被阻止:", e);
+                    });
+                }
+            };
+            
+            // 监听用户交互
+            document.addEventListener('click', enableAudio, { once: true });
+            document.addEventListener('touchstart', enableAudio, { once: true });
+            document.addEventListener('keydown', enableAudio, { once: true });
+            
+            // 备用音乐方案
+            setTimeout(() => {
+                if (bgMusic.paused && !userInteracted) {
+                    // 尝试使用备用音乐源
+                    const backupMusic = document.getElementById('backupMusic1');
+                    backupMusic.volume = 0.4;
+                    backupMusic.play().then(() => {
+                        musicControl.classList.add('playing');
+                        musicControl.classList.remove('paused');
+                        bgMusic.src = backupMusic.src;
+                    }).catch(e => {
+                        console.log("备用音乐也播放失败:", e);
+                    });
+                }
+            }, 3000);
+        }
+        
+        // 更新音乐
+        function updateMusic(index) {
+            const festival = festivals[index];
+            
+            // 保存当前播放状态和位置
+            const wasPlaying = !bgMusic.paused;
+            const currentTime = bgMusic.currentTime;
+            
+            // 更新音乐源
+            bgMusic.src = festival.music;
+            
+            // 恢复播放状态
+            if (wasPlaying) {
+                bgMusic.play().then(() => {
+                    musicControl.classList.add('playing');
+                    musicControl.classList.remove('paused');
+                    bgMusic.currentTime = currentTime > bgMusic.duration ? 0 : currentTime;
+                }).catch(e => {
+                    console.log("切换音乐播放失败:", e);
+                    // 尝试使用备用音乐
+                    tryBackupMusic(festival);
+                });
+            }
+            
+            // 移动端震动反馈
+            if (isMobile && 'vibrate' in navigator) {
+                navigator.vibrate(15);
+            }
+        }
+        
+        // 尝试备用音乐
+        function tryBackupMusic(festival) {
+            const backupMusic = document.getElementById('backupMusic2');
+            backupMusic.volume = bgMusic.volume;
+            
+            backupMusic.play().then(() => {
+                musicControl.classList.add('playing');
+                musicControl.classList.remove('paused');
+                bgMusic.src = backupMusic.src;
+                showToast('已切换至备用音乐源 🎵');
+            }).catch(e => {
+                console.log("备用音乐播放失败:", e);
+                showToast('音乐加载失败，请检查网络连接');
+            });
+        }
+        
+        // 清空祝福卡片
+        function resetBlessingCard() {
+            document.getElementById('userName').value = '';
+            document.getElementById('blessingText').value = '';
+            document.getElementById('blessingText').dispatchEvent(new Event('input'));
+            
+            // 显示提示
+            showToast('祝福内容已清空 ✨');
+            
+            // 移动端震动反馈
+            if (isMobile && 'vibrate' in navigator) {
+                navigator.vibrate(30);
+            }
+        }
+        
+        // 保存祝福卡片
+        async function saveBlessingCard(index) {
+            const festival = festivals[index];
+            const userName = document.getElementById('userName').value || '节日祝福者';
+            const blessingText = document.getElementById('blessingText').value || festival.placeholder;
+            
+            // 显示保存中提示
+            showToast('正在生成祝福卡片... ⏳');
+            
+            // 创建更精美的临时卡片
+            const tempCard = document.createElement('div');
+            tempCard.style.cssText = `
+                position: fixed;
+                top: -10000px;
+                left: -10000px;
+                width: 800px;
+                height: 1000px;
+                background: linear-gradient(135deg, ${festival.colorLight}, ${festival.color});
+                padding: 60px 50px;
+                font-family: 'Noto Serif SC', serif;
+                color: white;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                border-radius: 30px;
+                box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+                z-index: 10000;
+            `;
+            
+            tempCard.innerHTML = `
+                <div style="font-size: 5rem; margin-bottom: 30px; text-shadow: 3px 3px 10px rgba(0,0,0,0.2);">${festival.icon}</div>
+                <h2 style="font-size: 4rem; margin-bottom: 20px; text-shadow: 2px 2px 5px rgba(0,0,0,0.3);">${festival.name}</h2>
+                <div style="font-size: 2rem; margin-bottom: 40px; opacity: 0.9; font-style: italic;">${festival.date}</div>
+                
+                <div style="width: 500px; height: 2px; background: rgba(255,255,255,0.3); margin: 40px 0;"></div>
+                
+                <div style="font-size: 2.5rem; line-height: 1.8; text-align: center; margin-bottom: 50px; padding: 0 30px; min-height: 200px; display: flex; align-items: center;">
+                    "${blessingText}"
+                </div>
+                
+                <div style="font-size: 2.2rem; margin-top: auto; font-style: italic; color: rgba(255,255,255,0.9);">
+                    —— ${userName}
+                </div>
+                
+                <div style="font-size: 3rem; margin-top: 40px; letter-spacing: 8px; font-weight: bold; color: rgba(255,255,255,0.95);">
+                    ${festival.signature}
+                </div>
+                
+                <div style="margin-top: 60px; font-size: 1.5rem; opacity: 0.7;">
+                    中国传统节日图鉴 · 祝福永存
+                </div>
+                
+                <div style="position: absolute; top: 30px; right: 30px; font-size: 8rem; opacity: 0.1; transform: rotate(45deg);">
+                    ${festival.illustration}
+                </div>
+            `;
+            
+            document.body.appendChild(tempCard);
+            
+            try {
+                // 使用html2canvas生成高清图片
+                const canvas = await html2canvas(tempCard, {
+                    scale: 3,
+                    useCORS: true,
+                    backgroundColor: null,
+                    logging: false,
+                    allowTaint: true
+                });
+                
+                // 将canvas转换为图片URL
+                const imgUrl = canvas.toDataURL('image/png', 1.0);
+                
+                // 创建下载链接
+                const link = document.createElement('a');
+                link.href = imgUrl;
+                link.download = `${festival.name}祝福卡片_${new Date().getTime()}.png`;
+                
+                // 模拟点击下载
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                // 显示成功提示
+                showToast(`${festival.name}祝福卡片已保存！ ✨`);
+                
+                // 移动端震动反馈
+                if (isMobile && 'vibrate' in navigator) {
+                    navigator.vibrate([50, 50, 50]);
+                }
+                
+            } catch (err) {
+                console.error('保存卡片失败:', err);
+                showToast('保存失败，请重试 😔');
+            } finally {
+                // 移除临时卡片
+                document.body.removeChild(tempCard);
+            }
+        }
+        
+        // 显示提示信息
+        function showToast(message) {
+            toast.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', initPage);
+        
+        // 页面可见性变化时处理音乐
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                // 页面隐藏时暂停音乐
+                if (!bgMusic.paused) {
+                    bgMusic.pause();
+                }
+            } else {
+                // 页面显示时恢复音乐
+                if (musicControl.classList.contains('playing')) {
+                    bgMusic.play().catch(e => console.log("恢复播放失败:", e));
+                }
+            }
+        });
+        
+        // 防止滚动时音乐卡顿
+        window.addEventListener('scroll', () => {
+            // 仅在iOS设备上处理
+            if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+                bgMusic.volume = 0.2;
+                setTimeout(() => {
+                    bgMusic.volume = parseFloat(volumeControl.value);
+                }, 300);
+            }
+        });
+    </script>
+</body>
+</html>
